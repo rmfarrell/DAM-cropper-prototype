@@ -19,6 +19,25 @@ class Rend extends Component {
     return this.props.cropGuide && this.props.cropGuide.length && this.props.image
   }
 
+  /**
+   * get orientation of the image
+   * @reutrn {string} V|H|S (vertical|horizontal|square)
+   * 
+   */
+  get orientation() {
+    const { image } = this.props
+    if (!image) {
+      return null
+    }
+    if (image.height > image.width) {
+      return 'V'
+    }
+    if (image.height < image.width) {
+      return 'H'
+    }
+    return 'S'
+  }
+
   componentDidUpdate() {
     this.shouldSet && this.setImage()
   }
@@ -41,25 +60,40 @@ class Rend extends Component {
       zoom = false,
       ratio = ''
     } = this.props,
-      trimmed = {
-        top: zoom ? cropGuide[1] : 0,
-        bottom: zoom ? cropGuide[1] + cropGuide[3] : image.height,
-        left: zoom ? cropGuide[0] : 0,
-        right: zoom ? cropGuide[0] + cropGuide[2] : image.width
-      },
+
+      // trimmed = {
+      //   top: zoom ? cropGuide[1] : 0,
+      //   bottom: zoom ? cropGuide[1] + cropGuide[3] : image.height,
+      //   left: zoom ? cropGuide[0] : 0,
+      //   right: zoom ? cropGuide[0] + cropGuide[2] : image.width
+      // },
       midX = cropGuide[0] + cropGuide[2] / 2,
       midY = cropGuide[1] + cropGuide[3] / 2
 
-
     this.canvas.current.height = height
     this.canvas.current.width = width
+
+    if (zoom) {
+
+    }
+
     this.state.ctx.drawImage(
       image,
       -midX + width / 2,
       -midY + height / 2,
-      image.width,
-      image.height
+      width,
+      height
     )
+
+
+
+    // this.state.ctx.drawImage(
+    //   image,
+    //   -midX + width / 2,
+    //   -midY + height / 2,
+    //   image.width,
+    //   image.height
+    // )
   }
 
   render() {
@@ -84,3 +118,19 @@ Rend.propTypes = {
 }
 
 export default Rend
+
+
+function ratioFromWidth(w = 0, ratio = '') {
+  return {
+    height: 0,
+    width: 0
+  }
+}
+
+function ratioFromHeight(h = 0, ratio = '') {
+
+  return {
+    height: 0,
+    width: 0
+  }
+}
