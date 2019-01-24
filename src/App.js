@@ -144,17 +144,18 @@ class App extends Component {
   }
 
   drawRect = () => {
-    const { ctx, cropBox } = this.state
+    const { ctx, cropBox, previewImg } = this.state
     this.resetImage()
+    ctx.globalCompositeOperation = 'source-over'
     ctx.setLineDash([5, 5]);
     ctx.strokeRect(...cropBox)
+    ctx.globalCompositeOperation = 'multiply'
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.25)'
+    ctx.fillRect(0, 0, previewImg.width, cropBox[1])
+    ctx.fillRect(0, 0, cropBox[0], maxHeight)
+    ctx.fillRect(0, cropBox[1] + cropBox[3], maxHeight, previewImg.width)
+    ctx.fillRect(cropBox[0] + cropBox[2], 0, maxHeight, previewImg.width)
   }
 }
 
 export default App;
-
-// function drawRect(ctx, box, alt = false) {
-//   const marchingAngtsPattern = alt ? [5, 5] : [10, 5]
-//   console.log(marchingAngtsPattern)
-//   // requestAnimationFrame(() => drawRect(ctx, box, !alt))
-// }
