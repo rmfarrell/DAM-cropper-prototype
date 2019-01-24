@@ -1,3 +1,6 @@
 canvas {
   cursor: crosshair;
 }
+.rendContainer {
+  display: flex;
+}

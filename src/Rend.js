@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import './App.css';
 import styles from './css/Rend.module.css';
 import { timingSafeEqual } from 'crypto';
 
@@ -16,17 +15,12 @@ class Rend extends Component {
   }
 
   // getters
-  get = () => {
-    const { props } = this
-    return {
-      get shouldSet() {
-        return props.cropGuide && props.cropGuide.length && props.image
-      }
-    }
+  get shouldSet() {
+    return this.props.cropGuide && this.props.cropGuide.length && this.props.image
   }
 
   componentDidUpdate() {
-    this.get().shouldSet && this.setImage()
+    this.shouldSet && this.setImage()
   }
 
   componentDidMount() {
@@ -36,12 +30,27 @@ class Rend extends Component {
   }
 
   setImage = () => {
-    if (!this.get().shouldSet) {
+    if (!this.shouldSet) {
       return;
     }
-    const { height, width, image, cropGuide } = this.props
-    const midX = cropGuide[0] + cropGuide[2] / 2
-    const midY = cropGuide[1] + cropGuide[3] / 2
+    const {
+      height = 0,
+      width = 0,
+      image,
+      cropGuide,
+      zoom = false,
+      ratio = ''
+    } = this.props,
+      trimmed = {
+        top: zoom ? cropGuide[1] : 0,
+        bottom: zoom ? cropGuide[1] + cropGuide[3] : image.height,
+        left: zoom ? cropGuide[0] : 0,
+        right: zoom ? cropGuide[0] + cropGuide[2] : image.width
+      },
+      midX = cropGuide[0] + cropGuide[2] / 2,
+      midY = cropGuide[1] + cropGuide[3] / 2
+
+
     this.canvas.current.height = height
     this.canvas.current.width = width
     this.state.ctx.drawImage(
@@ -58,7 +67,7 @@ class Rend extends Component {
 
     return (
       <div className={styles.root}>
-        {this.get().shouldSet && this.props.children}
+        {this.shouldSet && this.props.children}
         {canvas}
       </div >
     );
@@ -69,7 +78,9 @@ Rend.propTypes = {
   image: PropTypes.object,
   height: PropTypes.number,
   width: PropTypes.number,
-  cropGuide: PropTypes.arrayOf(PropTypes.number)
+  cropGuide: PropTypes.arrayOf(PropTypes.number),
+  ratio: PropTypes.string,
+  zoom: PropTypes.bool
 }
 
 export default Rend

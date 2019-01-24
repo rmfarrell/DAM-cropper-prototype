@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
-import './App.css';
-import './css/App.module.css';
+import styles from './css/App.module.css';
 import Rend from './Rend'
 
 // TODO move to prop
@@ -25,7 +24,6 @@ class App extends Component {
     this.originalInput = React.createRef()
   }
 
-  // 🎩 Vue
   get scale() {
     const { previewImg } = this.state
     if (!previewImg) return null;
@@ -80,20 +78,30 @@ class App extends Component {
           width="0"
           ref={this.originalInput}
         ></canvas>
+        <div className={styles.rendContainer}>
 
-        <Rend
-          image={this.state.img}
-          height={600}
-          width={600}
-          cropGuide={this.cropGuide}
-        >
-          <h1>Thumbnail</h1>
-        </Rend>
-
+          <Rend
+            image={this.state.img}
+            height={200}
+            width={200}
+            zoom={true}
+            cropGuide={this.cropGuide} >
+            <h4>Thumbnail</h4>
+          </Rend>
+          <Rend
+            image={this.state.img}
+            height={400}
+            width={600}
+            ratio={'3:2'}
+            zoom={false}
+            cropGuide={this.cropGuide}>
+            <h4>3:2</h4>
+          </Rend>
+        </div>
 
 
         <input type="file" onChange={this.preview}></input>
-      </div>
+      </div >
     );
   }
 
@@ -140,17 +148,40 @@ class App extends Component {
   }
 
   drawRect = () => {
-    const { ctx, cropBox, previewImg } = this.state
+    const { ctx, cropBox, previewImg } = this.state,
+      centerCoords = [cropBox[0] + cropBox[2] / 2, cropBox[1] + cropBox[3] / 2]
     this.resetImage()
     ctx.globalCompositeOperation = 'source-over'
+
+    // dotted line
     ctx.setLineDash([5, 5]);
     ctx.strokeRect(...cropBox)
+
+    // draw faint black boxes
     ctx.globalCompositeOperation = 'multiply'
     ctx.fillStyle = 'rgba(0, 0, 0, 0.25)'
     ctx.fillRect(0, 0, previewImg.width, cropBox[1])
     ctx.fillRect(0, 0, cropBox[0], maxHeight)
     ctx.fillRect(0, cropBox[1] + cropBox[3], maxHeight, previewImg.width)
     ctx.fillRect(cropBox[0] + cropBox[2], 0, maxHeight, previewImg.width)
+
+    // center circle
+    ctx.beginPath();
+    ctx.arc(
+      ...centerCoords,
+      20,
+      0,
+      2 * Math.PI);
+
+
+    ctx.fillStyle = 'rgba(255,255,255,0.25)'
+    ctx.globalCompositeOperation = 'xor'
+    ctx.fill();
+
+    ctx.beginPath();
+    ctx.arc(...centerCoords, 20, 0, Math.PI, false);
+    ctx.closePath();
+    ctx.fill();
   }
 }
 
