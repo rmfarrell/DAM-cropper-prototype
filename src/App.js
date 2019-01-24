@@ -26,28 +26,25 @@ class App extends Component {
   }
 
   // 🎩 Vue
-  get = () => {
-    const { state } = this
+  get scale() {
+    const { previewImg } = this.state
+    if (!previewImg) return null;
+    return (previewImg.height >= maxHeight) ? previewImg.height / maxHeight : previewImg.height
+  }
+
+  get previewCenter() {
+    const [x1, y1, x2, y2] = this.state.cropBox
     return {
-      get scale() {
-        const { previewImg } = state
-        if (!previewImg) return null;
-        return (previewImg.height >= maxHeight) ? previewImg.height / maxHeight : previewImg.height
-      },
-      get previewCenter() {
-        const [x1, y1, x2, y2] = state.cropBox
-        return {
-          x: Math.floor((x2 + x1) / 2),
-          y: Math.floor((y2 + y1) / 2)
-        }
-      },
-      get cropGuide() {
-        if (state.cropBox.reduce((acc, n) => acc + n) === 0) {
-          return null;
-        }
-        return state.cropBox.map((n) => parseInt(n * this.scale, 10))
-      }
+      x: Math.floor((x2 + x1) / 2),
+      y: Math.floor((y2 + y1) / 2)
     }
+  }
+
+  get cropGuide() {
+    if (this.state.cropBox.reduce((acc, n) => acc + n) === 0) {
+      return null;
+    }
+    return this.state.cropBox.map((n) => parseInt(n * this.scale, 10))
   }
 
   preview = ({ target: { files = [] } }) => {
@@ -88,7 +85,7 @@ class App extends Component {
           image={this.state.img}
           height={600}
           width={600}
-          cropGuide={this.get().cropGuide}
+          cropGuide={this.cropGuide}
         >
           <h1>Thumbnail</h1>
         </Rend>
@@ -96,7 +93,6 @@ class App extends Component {
 
 
         <input type="file" onChange={this.preview}></input>
-        <p>{JSON.stringify(this.get())}</p>
       </div>
     );
   }
@@ -105,7 +101,7 @@ class App extends Component {
     const canvas = this.originalInput.current
     const { previewImg, ctx } = this.state
     const h = Math.min(previewImg.height, maxHeight)
-    const w = previewImg.width / this.get().scale
+    const w = previewImg.width / this.scale
     canvas.width = w
     canvas.height = h
     ctx.drawImage(previewImg, 0, 0, w, h);

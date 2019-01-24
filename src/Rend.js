@@ -8,7 +8,9 @@ class Rend extends Component {
   constructor(props) {
     super(props)
     this.state = {
-      ctx: null
+      ctx: null,
+      height: 0,
+      width: 0
     }
     this.canvas = React.createRef()
   }
