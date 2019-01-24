@@ -19,13 +19,6 @@ class Rend extends Component {
     return {
       get shouldSet() {
         return props.cropGuide && props.cropGuide.length && props.image
-      },
-      get midPoint() {
-        if (!this.shouldSet) {
-          return null
-        }
-        return [
-        ]
       }
     }
   }
@@ -49,14 +42,6 @@ class Rend extends Component {
     const midY = cropGuide[1] + cropGuide[3] / 2
     this.canvas.current.height = height
     this.canvas.current.width = width
-    console.log({
-      width,
-      height,
-      cropGuide,
-      midX,
-      midY,
-      param: [width - midX, height - midY, width, height]
-    })
     this.state.ctx.drawImage(
       image,
       -midX + width / 2,
