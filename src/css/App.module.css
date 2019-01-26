@@ -1,6 +1,8 @@
-canvas {
+.root > canvas {
   cursor: crosshair;
 }
 .rendContainer {
   display: flex;
+  flex-wrap: wrap;
+  width: 100%;
 }

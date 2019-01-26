@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import styles from './css/Rend.module.css';
 import { timingSafeEqual } from 'crypto';
+import Filler from './filler'
 
 class Rend extends Component {
   constructor(props) {
@@ -16,26 +17,7 @@ class Rend extends Component {
 
   // getters
   get shouldSet() {
-    return this.props.cropGuide && this.props.cropGuide.length && this.props.image
-  }
-
-  /**
-   * get orientation of the image
-   * @reutrn {string} V|H|S (vertical|horizontal|square)
-   * 
-   */
-  get orientation() {
-    const { image } = this.props
-    if (!image) {
-      return null
-    }
-    if (image.height > image.width) {
-      return 'V'
-    }
-    if (image.height < image.width) {
-      return 'H'
-    }
-    return 'S'
+    return this.props.cropGuide && this.props.cropGuide && this.props.image
   }
 
   componentDidUpdate() {
@@ -58,8 +40,10 @@ class Rend extends Component {
       image,
       cropGuide,
       zoom = false,
-      ratio = ''
+      ratio = '',
+      orientation = ''
     } = this.props,
+      // [ratioW = 1, ratioH = 1] = ratio.split(':'),
 
       // trimmed = {
       //   top: zoom ? cropGuide[1] : 0,
@@ -68,32 +52,112 @@ class Rend extends Component {
       //   right: zoom ? cropGuide[0] + cropGuide[2] : image.width
       // },
       midX = cropGuide[0] + cropGuide[2] / 2,
-      midY = cropGuide[1] + cropGuide[3] / 2
+      midY = cropGuide[1] + cropGuide[3] / 2;
 
-    this.canvas.current.height = height
+    let h, w, scale, cropHeight, cropWidth, x, y,
+      _ratio = ratio.split(':');
+    _ratio = _ratio[0] / _ratio[1];
+
+    // if (zoom) { }
+
+    // if (height && width) {
+    // figure out which is more important
+    // } else if (height) {
+    // define height
+    // } else if (width) {
+
+    // scale = width / image.width
+    // w = width
+    // h = image.height * scale
+
+    // console.table({
+    //   w,
+    //   h,
+    //   _ratio,
+    //   scale
+    // })
+
     this.canvas.current.width = width
+    this.canvas.current.height = width / _ratio;
 
-    if (zoom) {
+    // x = -midX + h / 2;
+    // y = -midY + h / 2;
 
-    }
+    const filler = new Filler({
+      outerHeight: this.canvas.current.height,
+      outerWidth: this.canvas.current.width
+    })
+
+    // [x, y, w, h] = fill({
+    //   outHeight: w / _ratio,
+    //   outWidth: w,
+    //   width: w,
+    //   height: h,
+    //   x,
+    //   y
+    // })
+
+    const cropped = filler.fill(image, cropGuide)
+
+    this.state.ctx.fillStyle = "#000"
+    this.state.ctx.fillRect(0, 0, this.canvas.current.width, this.canvas.current.height);
 
     this.state.ctx.drawImage(
       image,
-      -midX + width / 2,
-      -midY + height / 2,
-      width,
-      height
+      ...cropped
     )
 
 
 
-    // this.state.ctx.drawImage(
-    //   image,
-    //   -midX + width / 2,
-    //   -midY + height / 2,
-    //   image.width,
-    //   image.height
-    // )
+
+    // }
+
+    // function fill({
+    //   outHeight = 0,
+    //   outWidth = 0,
+    //   height = 0,
+    //   width = 0,
+    //   minHeight = 0,
+    //   minWidth = 0,
+    //   x = 0,
+    //   y = 0,
+    //   zoom = 'in'
+    // }) {
+    //   const stepSize = 0.1,
+    //     halfStepSize = stepSize / 2,
+    //     step = 1 + stepSize,
+    //     halfStep = 1 + halfStepSize
+
+    //   // solve by zooming
+    //   while (
+    //     y > 0 ||
+    //     y + height < outHeight ||
+    //     x > 0 ||
+    //     x + width < outWidth
+    //   ) {
+
+    //     // lemme help you debug that infinite loop, friend
+    //     console.info('undertop', y > 0)
+    //     console.info('tooshort', y + height < outHeight)
+    //     console.info('need more left', x > 0)
+    //     console.info('need more right', x + width < outWidth)
+
+    //     width = width * step
+    //     height = height * step
+    //     x = x - x * halfStep
+    //     y = y - y * halfStep
+
+    //     // todo: prevent cutting into min
+    //   }
+    //   return [x, y, width, height]
+
+    //   function zoomIn() {
+    //     width = width * step
+    //     height = height * step
+    //     x = x - x * halfStep
+    //     y = y - y * halfStep
+    //   }
+    // }
   }
 
   render() {
@@ -112,9 +176,10 @@ Rend.propTypes = {
   image: PropTypes.object,
   height: PropTypes.number,
   width: PropTypes.number,
-  cropGuide: PropTypes.arrayOf(PropTypes.number),
+  cropGuide: PropTypes.object,
   ratio: PropTypes.string,
-  zoom: PropTypes.bool
+  zoom: PropTypes.bool,
+  orientation: PropTypes.string
 }
 
 export default Rend

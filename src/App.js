@@ -27,7 +27,7 @@ class App extends Component {
   get scale() {
     const { previewImg } = this.state
     if (!previewImg) return null;
-    return (previewImg.height >= maxHeight) ? previewImg.height / maxHeight : previewImg.height
+    return maxHeight / previewImg.height
   }
 
   get previewCenter() {
@@ -39,10 +39,28 @@ class App extends Component {
   }
 
   get cropGuide() {
-    if (this.state.cropBox.reduce((acc, n) => acc + n) === 0) {
+    if (!this.state.previewImg) {
       return null;
     }
-    return this.state.cropBox.map((n) => parseInt(n * this.scale, 10))
+    let mins, center
+    const { cropBox } = this.state,
+      { height, width } = this.state.previewImg
+    if (cropBox.reduce((acc, n) => acc + n) === 0) {
+      return null;
+    }
+    mins = {
+      top: cropBox[1] / height,
+      right: (cropBox[0] + cropBox[2]) / width,
+      bottom: (cropBox[1] + cropBox[3]) / height,
+      left: cropBox[0] / width
+    }
+    center = {
+      x: (mins.right + mins.left) / 2,
+      y: (mins.top + mins.bottom) / 2
+    }
+    return Object.assign(mins, { center })
+
+    // return this.state.cropBox.map((n) => parseInt(n * this.scale, 10))
   }
 
   preview = ({ target: { files = [] } }) => {
@@ -70,7 +88,7 @@ class App extends Component {
 
   render() {
     return (
-      <div className="App">
+      <div className={styles.root}>
         <canvas
           id="original-input"
           draggable
@@ -82,21 +100,78 @@ class App extends Component {
 
           <Rend
             image={this.state.img}
-            height={200}
-            width={200}
-            zoom={true}
-            cropGuide={this.cropGuide} >
-            <h4>Thumbnail</h4>
-          </Rend>
-          <Rend
-            image={this.state.img}
-            height={400}
             width={600}
             ratio={'3:2'}
             zoom={false}
-            cropGuide={this.cropGuide}>
+            cropGuide={this.cropGuide}
+            orientation={this.orientation}
+          >
             <h4>3:2</h4>
           </Rend>
+
+          {/* <Rend
+            image={this.state.img}
+            width={500}
+            ratio={'2:1'}
+            zoom={false}
+            cropGuide={this.cropGuide}
+            orientation={this.orientation}
+          >
+            <h4>2:1</h4>
+          </Rend>
+
+          <Rend
+            image={this.state.img}
+            width={500}
+            ratio={'4:5'}
+            zoom={false}
+            cropGuide={this.cropGuide}
+            orientation={this.orientation}
+          >
+            <h4>4:5</h4>
+          </Rend>
+
+          <Rend
+            image={this.state.img}
+            width={500}
+            ratio={'1:1'}
+            zoom={false}
+            cropGuide={this.cropGuide}
+            orientation={this.orientation}
+          >
+            <h4>1:1</h4>
+          </Rend>
+
+          <Rend
+            image={this.state.img}
+            width={400}
+            ratio={'1:2'}
+            zoom={false}
+            cropGuide={this.cropGuide}
+            orientation={this.orientation}
+          >
+            <h4>1:2</h4>
+          </Rend>
+
+          <Rend
+            image={this.state.img}
+            width={600}
+            ratio={'3:2'}
+            zoom={false}
+            cropGuide={this.cropGuide}
+            orientation={this.orientation}
+          >
+            <h4>3:2</h4>
+          </Rend>
+          <Rend
+            image={this.state.img}
+            width={200}
+            zoom={true}
+            cropGuide={this.cropGuide}
+            orientation={this.orientation}
+          >
+            <h4>Thumbnail</h4>
+          </Rend> */}
         </div>
 
 
@@ -105,11 +180,33 @@ class App extends Component {
     );
   }
 
+  /**
+   * get orientation of the image
+   * @reutrn {string} V|H|S (vertical|horizontal|square)
+   * 
+   */
+  get orientation() {
+    const { img } = this.state
+    if (!img) {
+      return null
+    }
+    if (img.height > img.width) {
+      return 'V'
+    }
+    if (img.height < img.width) {
+      return 'H'
+    }
+    return 'S'
+  }
+
   resetImage = () => {
     const canvas = this.originalInput.current
     const { previewImg, ctx } = this.state
+
     const h = Math.min(previewImg.height, maxHeight)
-    const w = previewImg.width / this.scale
+    const w = (this.orientation == 'H')
+      ? previewImg.width
+      : previewImg.width * this.scale
     canvas.width = w
     canvas.height = h
     ctx.drawImage(previewImg, 0, 0, w, h);
