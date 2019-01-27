@@ -36,16 +36,22 @@ export default class Filler {
       this.scale = this.outerHeight / height;
       this.height = this.outerHeight;
       this.width = width * this.scale;
+      this.x = (this.outerWidth / 2) - (this.width * center.x)
+      this.y = 0
+      return
     } else {
       this.scale = this.outerWidth / width;
       this.width = this.outerWidth;
       this.height = height * this.scale;
+      // 200 - 400 * 0.5
+      this.y = (this.outerHeight / 2) - (this.height * center.y)
+      this.x = 0
     }
-
-    this.x = (this.outerWidth / 2) - (this.outerWidth * center.x)
-    this.y = (this.outerHeight / 2) - (this.outerHeight * center.y)
-    console.log(this.x)
-    console.log(this.y)
+    console.log('center', center)
+    console.log('width', this.width)
+    console.log('height', this.height)
+    console.log('x', this.x)
+    console.log('y', this.y)
   }
 
   anchorToInnerEdge() {
@@ -57,6 +63,35 @@ export default class Filler {
       this.min.left + this.min.right,
       this.min.top + this.min.bottom
     ]
+  }
+
+  shift(x = 0, y = 0) {
+    this.x = this.x + x
+    this.y = this.y + y
+  }
+
+  get shouldZoom() {
+    return this.height < this.outerHeight || this.width < this.outerWidth
+  }
+
+  fillSpace() {
+    if (this.gaps[0]) {
+      this.shift(0, -stepSize);
+      this.fillSpace();
+    }
+    if (this.gaps[1]) {
+      this.shift(0, stepSize);
+      this.fillSpace();
+    }
+    if (this.gaps[2]) {
+      this.shift(-stepSize);
+      this.fillSpace();
+    }
+    if (this.gaps[3]) {
+      this.shift(stepSize);
+      this.fillSpace();
+    }
+    return
   }
 
   fill(image, cropGuide, zoom = 'in') {
@@ -72,25 +107,37 @@ export default class Filler {
       this.anchorToOuterEdge(image, cropGuide)
     }
 
-    while (
-      counter &&
-      this.isGap
-    ) {
-      counter--
-      if (counter < 1) {
-        console.warn('too many iterations')
-        console.log(this.gaps)
-      }
-
-      // lemme help you debug that infinite loop, friend
-
-      if (zoom === 'out') {
-        this.zoomOut()
-        this.fill()
-      }
-      this.zoomIn()
-      this.fill()
+    if (this.shouldZoom) {
+      console.log('zooming happening')
+      return [0, 0, 0, 0];
+    } else {
+      // this.fillSpace()
     }
+
+
+
+
+    // pan to fit
+
+    // while (
+    //   counter &&
+    //   this.isGap
+    // ) {
+    //   counter--
+    //   if (counter < 1) {
+    //     console.warn('too many iterations')
+    //     console.log(this.gaps)
+    //   }
+
+    //   // lemme help you debug that infinite loop, friend
+
+    //   if (zoom === 'out') {
+    //     this.zoomOut()
+    //     this.fill()
+    //   }
+    //   this.zoomIn()
+    //   this.fill()
+    // }
 
     return [this.x, this.y, this.width, this.height]
   }
@@ -136,7 +183,6 @@ export default class Filler {
     y = y - (this.height - oldHeight) / 2
     this.x = x
     this.y = y
-    console.log(this.x, this.y)
 
     // @todo handle too far zoom
   }

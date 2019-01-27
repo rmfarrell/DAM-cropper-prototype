@@ -9,7 +9,6 @@ class App extends Component {
   constructor() {
     super()
     this.state = {
-      scale: 1,
       zoom: 0,
       trim: 0,
       ratio: {
@@ -19,6 +18,7 @@ class App extends Component {
       img: null,
       previewImg: null,
       cropBox: [0, 0, 0, 0],
+      cropCoords: [],
       ctx: null
     }
     this.originalInput = React.createRef()
@@ -30,37 +30,31 @@ class App extends Component {
     return maxHeight / previewImg.height
   }
 
-  get previewCenter() {
-    const [x1, y1, x2, y2] = this.state.cropBox
-    return {
-      x: Math.floor((x2 + x1) / 2),
-      y: Math.floor((y2 + y1) / 2)
-    }
-  }
-
   get cropGuide() {
+
     if (!this.state.previewImg) {
       return null;
     }
     let mins, center
-    const { cropBox } = this.state,
-      { height, width } = this.state.previewImg
-    if (cropBox.reduce((acc, n) => acc + n) === 0) {
+    const { cropCoords } = this.state,
+      { height, width } = this.state.previewImg,
+      h = height * this.scale,
+      w = width * this.scale
+
+    if (!cropCoords.length) {
       return null;
     }
     mins = {
-      top: cropBox[1] / height,
-      right: (cropBox[0] + cropBox[2]) / width,
-      bottom: (cropBox[1] + cropBox[3]) / height,
-      left: cropBox[0] / width
+      left: cropCoords[0] / w,
+      top: cropCoords[1] / h,
+      right: cropCoords[2] / w,
+      bottom: cropCoords[3] / h,
     }
     center = {
       x: (mins.right + mins.left) / 2,
       y: (mins.top + mins.bottom) / 2
     }
     return Object.assign(mins, { center })
-
-    // return this.state.cropBox.map((n) => parseInt(n * this.scale, 10))
   }
 
   preview = ({ target: { files = [] } }) => {
@@ -109,7 +103,18 @@ class App extends Component {
             <h4>3:2</h4>
           </Rend>
 
-          {/* <Rend
+          <Rend
+            image={this.state.img}
+            width={500}
+            ratio={'1:1'}
+            zoom={false}
+            cropGuide={this.cropGuide}
+            orientation={this.orientation}
+          >
+            <h4>1:1</h4>
+          </Rend>
+
+          {<Rend
             image={this.state.img}
             width={500}
             ratio={'2:1'}
@@ -119,6 +124,7 @@ class App extends Component {
           >
             <h4>2:1</h4>
           </Rend>
+          /* 
 
           <Rend
             image={this.state.img}
@@ -129,17 +135,6 @@ class App extends Component {
             orientation={this.orientation}
           >
             <h4>4:5</h4>
-          </Rend>
-
-          <Rend
-            image={this.state.img}
-            width={500}
-            ratio={'1:1'}
-            zoom={false}
-            cropGuide={this.cropGuide}
-            orientation={this.orientation}
-          >
-            <h4>1:1</h4>
           </Rend>
 
           <Rend
@@ -233,13 +228,15 @@ class App extends Component {
         offsetX,
         offsetY
       ]
+
       this.setState({
         cropBox: [
           Math.min(start[0], end[0]),
           Math.min(start[1], end[1]),
           Math.abs(start[0] - end[0]),
           Math.abs(start[1] - end[1])
-        ]
+        ],
+        cropCoords: [...start, ...end]
       })
     })
   }
