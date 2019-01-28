@@ -43,60 +43,19 @@ class Rend extends Component {
       ratio = '',
       orientation = ''
     } = this.props,
-      _zoom = (zoom) ? 'out' : 'in',
-      // [ratioW = 1, ratioH = 1] = ratio.split(':'),
-
-      // trimmed = {
-      //   top: zoom ? cropGuide[1] : 0,
-      //   bottom: zoom ? cropGuide[1] + cropGuide[3] : image.height,
-      //   left: zoom ? cropGuide[0] : 0,
-      //   right: zoom ? cropGuide[0] + cropGuide[2] : image.width
-      // },
-      midX = cropGuide[0] + cropGuide[2] / 2,
-      midY = cropGuide[1] + cropGuide[3] / 2;
+      _zoom = (zoom) ? 'out' : 'in';
 
     let h, w, scale, cropHeight, cropWidth, x, y,
       _ratio = ratio.split(':');
     _ratio = _ratio[0] / _ratio[1];
 
-    // if (zoom) { }
-
-    // if (height && width) {
-    // figure out which is more important
-    // } else if (height) {
-    // define height
-    // } else if (width) {
-
-    // scale = width / image.width
-    // w = width
-    // h = image.height * scale
-
-    // console.table({
-    //   w,
-    //   h,
-    //   _ratio,
-    //   scale
-    // })
-
     this.canvas.current.width = width
     this.canvas.current.height = width / _ratio;
-
-    // x = -midX + h / 2;
-    // y = -midY + h / 2;
 
     const filler = new Filler({
       outerHeight: this.canvas.current.height,
       outerWidth: this.canvas.current.width
     })
-
-    // [x, y, w, h] = fill({
-    //   outHeight: w / _ratio,
-    //   outWidth: w,
-    //   width: w,
-    //   height: h,
-    //   x,
-    //   y
-    // })
 
     const cropped = filler.fill(image, cropGuide, _zoom)
 
@@ -107,58 +66,6 @@ class Rend extends Component {
       image,
       ...cropped
     )
-
-
-
-
-    // }
-
-    // function fill({
-    //   outHeight = 0,
-    //   outWidth = 0,
-    //   height = 0,
-    //   width = 0,
-    //   minHeight = 0,
-    //   minWidth = 0,
-    //   x = 0,
-    //   y = 0,
-    //   zoom = 'in'
-    // }) {
-    //   const stepSize = 0.1,
-    //     halfStepSize = stepSize / 2,
-    //     step = 1 + stepSize,
-    //     halfStep = 1 + halfStepSize
-
-    //   // solve by zooming
-    //   while (
-    //     y > 0 ||
-    //     y + height < outHeight ||
-    //     x > 0 ||
-    //     x + width < outWidth
-    //   ) {
-
-    //     // lemme help you debug that infinite loop, friend
-    //     console.info('undertop', y > 0)
-    //     console.info('tooshort', y + height < outHeight)
-    //     console.info('need more left', x > 0)
-    //     console.info('need more right', x + width < outWidth)
-
-    //     width = width * step
-    //     height = height * step
-    //     x = x - x * halfStep
-    //     y = y - y * halfStep
-
-    //     // todo: prevent cutting into min
-    //   }
-    //   return [x, y, width, height]
-
-    //   function zoomIn() {
-    //     width = width * step
-    //     height = height * step
-    //     x = x - x * halfStep
-    //     y = y - y * halfStep
-    //   }
-    // }
   }
 
   render() {
@@ -166,8 +73,8 @@ class Rend extends Component {
 
     return (
       <div className={styles.root}>
-        {this.shouldSet && this.props.children}
         {canvas}
+        {this.shouldSet && this.props.children}
       </div >
     );
   }

@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import styles from './css/App.module.css';
+import serialize from 'form-serialize'
 import Rend from './Rend'
 
 // TODO move to prop
@@ -85,6 +86,10 @@ class App extends Component {
     this.originalInput = React.createRef()
   }
 
+  get isCropBox() {
+    return this.state.cropBox.reduce((v, acc) => acc += v) > 0
+  }
+
   get scale() {
     const { previewImg } = this.state
     if (!previewImg) return null;
@@ -118,6 +123,10 @@ class App extends Component {
     return Object.assign(mins, { center })
   }
 
+  reset() {
+    window.location.reload()
+  }
+
   preview = ({ target: { files = [] } }) => {
     const [file] = files,
       reader = new FileReader(),
@@ -127,7 +136,6 @@ class App extends Component {
     reader.addEventListener('load', (e) => {
       const img = new Image(),
         { result } = e.target;
-
       img.onload = () => {
         this.setState({
           ctx,
@@ -141,26 +149,48 @@ class App extends Component {
     file && reader.readAsDataURL(file)
   }
 
-  handleChange = (e, idx) => {
-    console.log(e)
+  updateRendition = (evt, idx) => {
+    evt.preventDefault()
+    const { width, ratio1, ratio2, zoom } = serialize(evt.target, { hash: true }),
+      renders = this.state.renders.slice(0)
+    renders[idx] = {
+      width: Number(width),
+      ratio: `${ratio1}:${ratio2}`,
+      zoom: zoom === 'on'
+    }
+    this.setState({ renders })
   }
 
   render() {
     return (
       <div className={styles.root}>
-        <canvas
-          id="original-input"
-          draggable
-          height="0"
-          width="0"
-          ref={this.originalInput}
-        ></canvas>
+        <div className={styles.center}>
+          <canvas
+            id="original-input"
+            draggable
+            height="0"
+            width="0"
+            ref={this.originalInput}
+          ></canvas>
+          {this.state.img === null || <button className={styles.reset} onClick={this.reset}>🚫</button>}
+
+          {this.state.img === null && (
+            <label className={styles.fileUploadContainer}>
+              Upload image here.
+              <input type="file" name="img" id="img" onChange={this.preview}></input>
+            </label>
+          )}
+          {this.state.img === null || this.isCropBox ||
+            <p>Draw a rectangle around the area you want to crop</p>
+          }
+        </div>
+
         <div className={styles.rendContainer}>
 
           {this.state.renders.map(({ width, ratio, zoom }, idx) => {
 
             return (<Rend
-              key={`${ratio}${zoom}`}
+              key={`${ratio}${zoom}${width}`}
               image={this.state.img}
               width={width}
               ratio={ratio}
@@ -168,26 +198,30 @@ class App extends Component {
               cropGuide={this.cropGuide}
               orientation={this.orientation}
             >
-              <h4>{`/v2/${ratio}/${zoom ? 'zoom/' : ''}imagename.jpg`}</h4>
-              <input type="checkbox" name="zoom" checked={zoom} onChange={(e) => this.handleChange(e, idx)} />
-              <input type="text" name="ratio1" value={ratio.split(':')[0]} onChange={(e) => this.handleChange(e, idx)} />
-              <input type="text" name="ratio2" value={ratio.split(':')[1]} onChange={(e) => this.handleChange(e, idx)} />
-              <input type="width" name="width" value={width} onChange={(e) => this.handleChange(e, idx)} />
+              <h4>{`/v2/${ratio}/${zoom ? 'zoom/' : ''}imagename.jpg?w=${width}`}</h4>
+              <form onSubmit={(e) => this.updateRendition(e, idx)}>
+                <p>
+                  <input type="checkbox" name="zoom" defaultChecked={zoom} />
+                  <label>Zoom</label>
+                </p>
+                <p>
+                  <label>Ratio</label>
+                  <input type="number" name="ratio1" width="2" defaultValue={ratio.split(':')[0]} />:
+                <input type="number" name="ratio2" width="2" defaultValue={ratio.split(':')[1]} />
+                </p>
+                <p>
+                  <label>Width</label>
+                  <input type="number" name="width" defaultValue={width} />
+                </p>
+                <input type="submit" value="update"></input>
+              </form>
             </Rend>)
           })}
         </div>
-
-
-        <input type="file" onChange={this.preview}></input>
       </div >
     );
   }
 
-  /**
-   * get orientation of the image
-   * @reutrn {string} V|H|S (vertical|horizontal|square)
-   * 
-   */
   get orientation() {
     const { img } = this.state
     if (!img) {
@@ -235,6 +269,12 @@ class App extends Component {
         offsetY
       ]
 
+      // don't accept upside down rectangles
+      if (start[0] > end[0] || start[1] > end[1]) {
+        console.error('no upside down crop rectangles RN')
+        return;
+      }
+
       this.setState({
         cropBox: [
           Math.min(start[0], end[0]),
@@ -256,14 +296,6 @@ class App extends Component {
     // dotted line
     ctx.setLineDash([5, 5]);
     ctx.strokeRect(...cropBox)
-
-    // draw faint black boxes
-    ctx.globalCompositeOperation = 'multiply'
-    ctx.fillStyle = 'rgba(0, 0, 0, 0.25)'
-    ctx.fillRect(0, 0, previewImg.width, cropBox[1])
-    ctx.fillRect(0, 0, cropBox[0], maxHeight)
-    ctx.fillRect(0, cropBox[1] + cropBox[3], maxHeight, previewImg.width)
-    ctx.fillRect(cropBox[0] + cropBox[2], 0, maxHeight, previewImg.width)
 
     // center circle
     ctx.beginPath();

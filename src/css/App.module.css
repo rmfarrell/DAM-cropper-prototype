@@ -1,8 +1,75 @@
-.root > canvas {
+
+.center {
+  text-align: center;
+}
+.center > canvas {
   cursor: crosshair;
+  margin: 0 auto;
 }
 .rendContainer {
   display: flex;
   flex-wrap: wrap;
   width: 100%;
+  justify-content: center;
+}
+
+.root input {
+  display: inline-block;
+}
+
+.root input[type=number] {
+  font-size: 0.7em;
+  width: 4em;
+}
+
+.root input[type=submit] {
+  background-color: #666;
+  font-size: 0.8em;
+  text-transform: uppercase;
+  color: white;
+  border: none;
+}
+
+.root form p {
+  margin: 0.5em 0;
+}
+
+.root label {
+  margin: 0 0.5em;
+  font-size: 0.8em;
+  text-transform: uppercase
+}
+
+button {
+  background-color: transparent;
+  border: none;
+}
+
+.reset {
+  font-size: 2em;
+  cursor: pointer;
+}
+
+.fileUploadContainer {
+  display: inline-block;
+  border: 1px solid red;
+  display: inline-block;
+  cursor: pointer;
+  position: relative;
+  margin: 6em auto;
+  padding: 8em 3em;
+  border-radius: 50%;
+  background-color: green;
+  border: 2px dashed white;
+  color: white;
+}
+
+.fileUploadContainer input[type="file"] {
+  /* visibility: hidden; */
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 100%;
+  opacity: 0;
 }
