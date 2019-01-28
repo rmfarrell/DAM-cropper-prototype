@@ -19,7 +19,68 @@ class App extends Component {
       previewImg: null,
       cropBox: [0, 0, 0, 0],
       cropCoords: [],
-      ctx: null
+      ctx: null,
+      renders: [
+
+        // 3:2
+        {
+          width: 400,
+          ratio: '3:2',
+          zoom: false
+        },
+        {
+          width: 400,
+          ratio: '3:2',
+          zoom: true
+        },
+
+        // 1:1
+        {
+          width: 400,
+          ratio: '1:1',
+          zoom: true
+        },
+
+        {
+          width: 400,
+          ratio: '1:1',
+          zoom: false
+        },
+
+        // various horizontals
+        {
+          width: 400,
+          ratio: '2:1',
+          zoom: false
+        },
+        {
+          width: 400,
+          ratio: '16:9',
+          zoom: false
+        },
+        {
+          width: 400,
+          ratio: '12:5',
+          zoom: false
+        },
+
+        // various vertical
+        {
+          width: 200,
+          ratio: '2:5',
+          zoom: false
+        },
+        {
+          width: 200,
+          ratio: '3:5',
+          zoom: false
+        },
+        {
+          width: 200,
+          ratio: '4:7',
+          zoom: false
+        },
+      ]
     }
     this.originalInput = React.createRef()
   }
@@ -80,6 +141,10 @@ class App extends Component {
     file && reader.readAsDataURL(file)
   }
 
+  handleChange = (e, idx) => {
+    console.log(e)
+  }
+
   render() {
     return (
       <div className={styles.root}>
@@ -92,60 +157,24 @@ class App extends Component {
         ></canvas>
         <div className={styles.rendContainer}>
 
-          <Rend
-            image={this.state.img}
-            width={400}
-            ratio={'4:5'}
-            zoom={false}
-            cropGuide={this.cropGuide}
-            orientation={this.orientation}
-          >
-            <h4>4:5</h4>
-          </Rend>
+          {this.state.renders.map(({ width, ratio, zoom }, idx) => {
 
-          <Rend
-            image={this.state.img}
-            width={400}
-            ratio={'3:2'}
-            zoom={true}
-            cropGuide={this.cropGuide}
-            orientation={this.orientation}
-          >
-            <h4>3:2 (zoomed)</h4>
-          </Rend>
-
-          <Rend
-            image={this.state.img}
-            width={400}
-            ratio={'1:1'}
-            zoom={false}
-            cropGuide={this.cropGuide}
-            orientation={this.orientation}
-          >
-            <h4>1:1</h4>
-          </Rend>
-
-          <Rend
-            image={this.state.img}
-            width={400}
-            ratio={'3:2'}
-            zoom={false}
-            cropGuide={this.cropGuide}
-            orientation={this.orientation}
-          >
-            <h4>3:2</h4>
-          </Rend>
-
-          <Rend
-            image={this.state.img}
-            width={400}
-            ratio={'2:1'}
-            zoom={false}
-            cropGuide={this.cropGuide}
-            orientation={this.orientation}
-          >
-            <h4>2:1</h4>
-          </Rend>
+            return (<Rend
+              key={`${ratio}${zoom}`}
+              image={this.state.img}
+              width={width}
+              ratio={ratio}
+              zoom={zoom}
+              cropGuide={this.cropGuide}
+              orientation={this.orientation}
+            >
+              <h4>{`/v2/${ratio}/${zoom ? 'zoom/' : ''}imagename.jpg`}</h4>
+              <input type="checkbox" name="zoom" checked={zoom} onChange={(e) => this.handleChange(e, idx)} />
+              <input type="text" name="ratio1" value={ratio.split(':')[0]} onChange={(e) => this.handleChange(e, idx)} />
+              <input type="text" name="ratio2" value={ratio.split(':')[1]} onChange={(e) => this.handleChange(e, idx)} />
+              <input type="width" name="width" value={width} onChange={(e) => this.handleChange(e, idx)} />
+            </Rend>)
+          })}
         </div>
 
 

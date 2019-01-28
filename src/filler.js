@@ -1,7 +1,3 @@
-const stepSize = 0.1,
-  halfStepSize = stepSize / 2,
-  step = 1 + stepSize;
-
 export default class Filler {
   constructor(opts = {}) {
     this.outerWidth = opts.outerWidth || 0;
@@ -21,13 +17,12 @@ export default class Filler {
     // this.orientation = (this.outerHeight > this.outerWidth) ? 'V' : 'H'
   }
 
-  anchorToOuterEdge(image, cropGuide) {
+  anchorToOuterEdge(image, center = { x: 0, y: 0 }) {
     if (!image) {
       throw new Error('no image')
     }
 
-    const { height, width } = image,
-      { left, top, right, bottom, center } = cropGuide
+    const { height, width } = image;
 
     // fill the largest axis
     if (this.isVertical) {
@@ -73,10 +68,6 @@ export default class Filler {
     }
     this.x = (this.outerWidth / 2) - (this.width * center.x)
     this.y = (this.outerHeight / 2) - (this.height * center.y)
-    console.log('height', this.height)
-    console.log('width', this.width)
-    console.log('x', this.x)
-    console.log('y', this.y)
   }
 
   get focalPoint() {
@@ -134,43 +125,19 @@ export default class Filler {
 
     if (zoom === 'out') {
       this.anchorToInnerEdge(image, cropGuide)
-      // this.cover()
+      this.zoomToFit()
+      this.cover()
     } else {
-      this.anchorToOuterEdge(image, cropGuide)
+      this.anchorToOuterEdge(image, cropGuide.center)
       this.zoomToFit()
       this.cover()
     }
-    // pan to fit
-
-    // while (
-    //   counter &&
-    //   this.isGap
-    // ) {
-    //   counter--
-    //   if (counter < 1) {
-    //     console.warn('too many iterations')
-    //     console.log(this.gaps)
-    //   }
-
-    //   // lemme help you debug that infinite loop, friend
-
-    //   if (zoom === 'out') {
-    //     this.zoomOut()
-    //     this.fill()
-    //   }
-    //   this.zoomIn()
-    //   this.fill()
-    // }
 
     return [this.x, this.y, this.width, this.height]
   }
 
   get isVertical() {
     return this.outerHeight > this.outerWidth
-  }
-
-  pan() {
-
   }
 
   get gaps() {
