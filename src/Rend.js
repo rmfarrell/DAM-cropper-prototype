@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import styles from './css/Rend.module.css';
 import { timingSafeEqual } from 'crypto';
-import Filler from './filler'
+import Cropper from './cropper'
 
 class Rend extends Component {
   constructor(props) {
@@ -52,12 +52,12 @@ class Rend extends Component {
     this.canvas.current.width = width
     this.canvas.current.height = width / _ratio;
 
-    const filler = new Filler({
+    const cropping = new Cropper({
       outerHeight: this.canvas.current.height,
       outerWidth: this.canvas.current.width
     })
 
-    const cropped = filler.fill(image, cropGuide, _zoom)
+    const cropped = cropping.crop(image, cropGuide, _zoom)
 
     this.state.ctx.fillStyle = "red"
     this.state.ctx.fillRect(0, 0, this.canvas.current.width, this.canvas.current.height);
