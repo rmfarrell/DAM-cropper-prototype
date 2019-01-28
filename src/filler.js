@@ -1,8 +1,6 @@
 const stepSize = 0.1,
   halfStepSize = stepSize / 2,
-  step = 1 + stepSize,
-  halfStep = 1 + halfStepSize,
-  maxIterations = 100;
+  step = 1 + stepSize;
 
 export default class Filler {
   constructor(opts = {}) {
@@ -47,11 +45,11 @@ export default class Filler {
       this.y = (this.outerHeight / 2) - (this.height * center.y)
       this.x = 0
     }
-    console.log('center', center)
-    console.log('width', this.width)
-    console.log('height', this.height)
-    console.log('x', this.x)
-    console.log('y', this.y)
+    // console.log('center', center)
+    // console.log('width', this.width)
+    // console.log('height', this.height)
+    // console.log('x', this.x)
+    // console.log('y', this.y)
   }
 
   anchorToInnerEdge() {
@@ -74,28 +72,40 @@ export default class Filler {
     return this.height < this.outerHeight || this.width < this.outerWidth
   }
 
-  fillSpace() {
+  zoom() {
+    const zoomStep = 1.05;
+    console.log(this.height)
+    while (this.shouldZoom) {
+      const oldHeight = this.height,
+        oldWidth = this.width
+      this.height = oldHeight * zoomStep
+      this.width = oldWidth * zoomStep
+      console.log(this.height)
+      this.x = this.x -= (this.width - oldWidth) / 2
+      this.y = this.y -= (this.height - oldHeight) / 2
+    }
+  }
+
+  cover() {
+
     if (this.gaps[0]) {
-      this.shift(0, -stepSize);
-      this.fillSpace();
+      this.y = 0
     }
     if (this.gaps[1]) {
-      this.shift(0, stepSize);
-      this.fillSpace();
+      this.shift(0, 1)
+      this.cover()
     }
     if (this.gaps[2]) {
-      this.shift(-stepSize);
-      this.fillSpace();
+      this.x = 0
     }
     if (this.gaps[3]) {
-      this.shift(stepSize);
-      this.fillSpace();
+      this.shift(1)
+      this.cover()
     }
     return
   }
 
   fill(image, cropGuide, zoom = 'in') {
-    let counter = maxIterations
 
     if (!image) {
       return;
@@ -107,15 +117,9 @@ export default class Filler {
       this.anchorToOuterEdge(image, cropGuide)
     }
 
-    if (this.shouldZoom) {
-      console.log('zooming happening')
-      return [0, 0, 0, 0];
-    } else {
-      // this.fillSpace()
-    }
+    this.zoom()
 
-
-
+    this.cover()
 
     // pan to fit
 

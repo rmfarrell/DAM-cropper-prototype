@@ -106,6 +106,17 @@ class App extends Component {
           <Rend
             image={this.state.img}
             width={500}
+            ratio={'2:1'}
+            zoom={false}
+            cropGuide={this.cropGuide}
+            orientation={this.orientation}
+          >
+            <h4>2:1</h4>
+          </Rend>
+
+          <Rend
+            image={this.state.img}
+            width={500}
             ratio={'1:1'}
             zoom={false}
             cropGuide={this.cropGuide}
@@ -114,16 +125,7 @@ class App extends Component {
             <h4>1:1</h4>
           </Rend>
 
-          {<Rend
-            image={this.state.img}
-            width={500}
-            ratio={'2:1'}
-            zoom={false}
-            cropGuide={this.cropGuide}
-            orientation={this.orientation}
-          >
-            <h4>2:1</h4>
-          </Rend>
+          {
           /* 
 
           <Rend
@@ -199,9 +201,7 @@ class App extends Component {
     const { previewImg, ctx } = this.state
 
     const h = Math.min(previewImg.height, maxHeight)
-    const w = (this.orientation == 'H')
-      ? previewImg.width
-      : previewImg.width * this.scale
+    const w = previewImg.width * this.scale
     canvas.width = w
     canvas.height = h
     ctx.drawImage(previewImg, 0, 0, w, h);
