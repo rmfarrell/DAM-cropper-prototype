@@ -93,6 +93,7 @@ class App extends Component {
   get scale() {
     const { previewImg } = this.state
     if (!previewImg) return null;
+    console.log(maxHeight / previewImg.height)
     return maxHeight / previewImg.height
   }
 
@@ -240,7 +241,7 @@ class App extends Component {
     const canvas = this.originalInput.current
     const { previewImg, ctx } = this.state
 
-    const h = Math.min(previewImg.height, maxHeight)
+    const h = previewImg.height * this.scale
     const w = previewImg.width * this.scale
     canvas.width = w
     canvas.height = h
