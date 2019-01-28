@@ -1,34 +1,49 @@
-export default class Filler {
-  constructor(opts = {}) {
-    this.outerWidth = opts.outerWidth || 0;
-    this.min = {
-      bottom: Infinity,
-      top: -Infinity,
-      left: -Infinity,
-      right: Infinity
-    };
-    this.center = [];
-    this.outerHeight = opts.outerHeight || 0;
+/**
+ * Create a cropping of given an image and crop guides
+ */
+export default class Cropper {
+  /** 
+   * Constructor for Cropper
+   * 
+   * @param {Image} image
+   * @param {object} focus - x/y coordinates of center of photo center of interest
+   * @param {number} focus.x
+   * @param {number} focus.y 
+   * @param {object} [cropGuide]
+   * @param {number} [cropGuide][top] - top of crop area
+   * @param {number} [cropGuide][bottom] - bottom of crop area
+   * @param {number} [cropGuide][left] - left edge of crop area
+   * @param {number} [cropGuide][right] - right edge of crop area
+   */
+  constructor(image, focus = { x: 0, y: 0 }, cropGuide) {
+    this.focus = focus
+    this.image = image
+    this.cropGuide = cropGuide
+    this.outerWidth = 0
+    this.outerHeight = 0
     this.width = 0
     this.height = 0
     this.scale = 1
     this.x = 0
     this.y = 0
+
+    if (!image) {
+      throw new Error('image required')
+    }
   }
 
-  anchorToOuterEdge(image, center = { x: 0, y: 0 }) {
-    if (!image) {
-      throw new Error('no image')
-    }
 
-    const { height, width } = image;
+
+  anchorToOuterEdge() {
+
+    const { height, width } = this.image;
 
     // fill the largest axis
     if (this.isVertical) {
       this.scale = this.outerHeight / height;
       this.height = this.outerHeight;
       this.width = width * this.scale;
-      this.x = (this.outerWidth / 2) - (this.width * center.x)
+      this.x = (this.outerWidth / 2) - (this.width * this.focus.x)
       this.y = 0
       return
     } else {
@@ -36,19 +51,15 @@ export default class Filler {
       this.width = this.outerWidth;
       this.height = height * this.scale;
       // 200 - 400 * 0.5
-      this.y = (this.outerHeight / 2) - (this.height * center.y)
+      this.y = (this.outerHeight / 2) - (this.height * this.focus.y)
       this.x = 0
     }
   }
 
-  anchorToInnerEdge(image, cropGuide) {
+  anchorToInnerEdge() {
 
-    if (!image) {
-      throw new Error('no image')
-    }
-
-    const { height, width } = image,
-      { left, top, right, bottom, center } = cropGuide
+    const { height, width } = this.image,
+      { left, top, right, bottom } = this.cropGuide
 
     // set initial zoom
     // if inner image has wider ratio than container
@@ -65,15 +76,8 @@ export default class Filler {
       this.scale = this.height / height
       this.width = width * this.scale
     }
-    this.x = (this.outerWidth / 2) - (this.width * center.x)
-    this.y = (this.outerHeight / 2) - (this.height * center.y)
-  }
-
-  get focalPoint() {
-    return [
-      this.min.left + this.min.right,
-      this.min.top + this.min.bottom
-    ]
+    this.x = (this.outerWidth / 2) - (this.width * this.focus.x)
+    this.y = (this.outerHeight / 2) - (this.height * this.focus.y)
   }
 
   shift(x = 0, y = 0) {
@@ -115,19 +119,17 @@ export default class Filler {
     }
     return
   }
+  crop(width = 0, height = 0, zoom = 'in') {
+    this.outerHeight = height
+    this.outerWidth = width;
 
-  crop(image, cropGuide, zoom = 'in') {
-
-    if (!image) {
-      return;
-    }
 
     if (zoom === 'out') {
-      this.anchorToInnerEdge(image, cropGuide)
+      this.anchorToInnerEdge(this.image, this.cropGuide)
       this.zoomToFit()
       this.cover()
     } else {
-      this.anchorToOuterEdge(image, cropGuide.center)
+      this.anchorToOuterEdge(this.image, this.focus)
       this.zoomToFit()
       this.cover()
     }

@@ -52,20 +52,19 @@ class Rend extends Component {
     this.canvas.current.width = width
     this.canvas.current.height = width / _ratio;
 
-    const cropping = new Cropper({
-      outerHeight: this.canvas.current.height,
-      outerWidth: this.canvas.current.width
-    })
+    const cropping = new Cropper(image, cropGuide.focus, cropGuide);
 
-    const cropped = cropping.crop(image, cropGuide, _zoom)
-
-    this.state.ctx.fillStyle = "red"
-    this.state.ctx.fillRect(0, 0, this.canvas.current.width, this.canvas.current.height);
+    this.ctx.fillStyle = "red"
+    this.ctx.fillRect(0, 0, this.canvas.current.width, this.canvas.current.height);
 
     this.state.ctx.drawImage(
       image,
-      ...cropped
+      ...cropping.crop(this.canvas.current.width, this.canvas.current.height, _zoom)
     )
+  }
+
+  get ctx() {
+    return this.state.ctx
   }
 
   render() {
