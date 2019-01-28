@@ -147,7 +147,7 @@ export default class Filler {
   }
 
   get isVertical() {
-    return this.outerHeight > this.outerWidth
+    return this.height > this.width
   }
 
   pan() {
@@ -175,20 +175,6 @@ export default class Filler {
 
   get isGap() {
     return this.gaps.some((b) => b)
-  }
-
-  zoomIn() {
-    let { x, y } = this
-    const oldHeight = this.height,
-      oldWidth = this.width
-    this.width = this.width * step
-    this.height = this.height * step
-    x = x - (this.width - oldWidth) / 2
-    y = y - (this.height - oldHeight) / 2
-    this.x = x
-    this.y = y
-
-    // @todo handle too far zoom
   }
 
   zoomOut(x, y, height, width) {

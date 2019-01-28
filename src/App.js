@@ -94,6 +94,17 @@ class App extends Component {
 
           <Rend
             image={this.state.img}
+            width={500}
+            ratio={'1:1'}
+            zoom={false}
+            cropGuide={this.cropGuide}
+            orientation={this.orientation}
+          >
+            <h4>1:1</h4>
+          </Rend>
+
+          <Rend
+            image={this.state.img}
             width={600}
             ratio={'3:2'}
             zoom={false}
@@ -117,20 +128,6 @@ class App extends Component {
           <Rend
             image={this.state.img}
             width={500}
-            ratio={'1:1'}
-            zoom={false}
-            cropGuide={this.cropGuide}
-            orientation={this.orientation}
-          >
-            <h4>1:1</h4>
-          </Rend>
-
-          {
-          /* 
-
-          <Rend
-            image={this.state.img}
-            width={500}
             ratio={'4:5'}
             zoom={false}
             cropGuide={this.cropGuide}
@@ -138,37 +135,6 @@ class App extends Component {
           >
             <h4>4:5</h4>
           </Rend>
-
-          <Rend
-            image={this.state.img}
-            width={400}
-            ratio={'1:2'}
-            zoom={false}
-            cropGuide={this.cropGuide}
-            orientation={this.orientation}
-          >
-            <h4>1:2</h4>
-          </Rend>
-
-          <Rend
-            image={this.state.img}
-            width={600}
-            ratio={'3:2'}
-            zoom={false}
-            cropGuide={this.cropGuide}
-            orientation={this.orientation}
-          >
-            <h4>3:2</h4>
-          </Rend>
-          <Rend
-            image={this.state.img}
-            width={200}
-            zoom={true}
-            cropGuide={this.cropGuide}
-            orientation={this.orientation}
-          >
-            <h4>Thumbnail</h4>
-          </Rend> */}
         </div>
 
 
