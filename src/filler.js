@@ -45,11 +45,6 @@ export default class Filler {
       this.y = (this.outerHeight / 2) - (this.height * center.y)
       this.x = 0
     }
-    // console.log('center', center)
-    // console.log('width', this.width)
-    // console.log('height', this.height)
-    // console.log('x', this.x)
-    // console.log('y', this.y)
   }
 
   anchorToInnerEdge(image, cropGuide) {
@@ -61,22 +56,27 @@ export default class Filler {
     const { height, width } = image,
       { left, top, right, bottom, center } = cropGuide
 
-    // fill the largest axis
-    if (this.isVertical) {
-      this.scale = this.outerHeight / height;
-      this.height = this.outerHeight;
-      this.width = width * this.scale;
-      this.x = (this.outerWidth / 2) - (this.width * center.x)
-      this.y = 0
-      return
-    } else {
-      this.scale = this.outerWidth / width;
-      this.width = this.outerWidth;
-      this.height = height * this.scale;
-      // 200 - 400 * 0.5
-      this.y = (this.outerHeight / 2) - (this.height * center.y)
-      this.x = 0
+    // set initial zoom
+    // if inner image has wider ratio than container
+    if ((right - left) / (bottom - top) > this.outerWidth / this.outerHeight) {
+
+      // set image width to outer width / inner width
+      this.width = this.outerWidth / (right - left)
+      this.scale = this.width / width
+      this.height = height * this.scale
     }
+    else {
+      // set image height to outer width / inner height
+      this.height = this.outerHeight / (bottom - top)
+      this.scale = this.height / height
+      this.width = width * this.scale
+    }
+    this.x = (this.outerWidth / 2) - (this.width * center.x)
+    this.y = (this.outerHeight / 2) - (this.height * center.y)
+    console.log('height', this.height)
+    console.log('width', this.width)
+    console.log('x', this.x)
+    console.log('y', this.y)
   }
 
   get focalPoint() {
@@ -132,17 +132,14 @@ export default class Filler {
       return;
     }
 
-
     if (zoom === 'out') {
       this.anchorToInnerEdge(image, cropGuide)
+      // this.cover()
     } else {
       this.anchorToOuterEdge(image, cropGuide)
+      this.zoomToFit()
+      this.cover()
     }
-
-    this.zoomToFit()
-
-    this.cover()
-
     // pan to fit
 
     // while (
@@ -169,7 +166,7 @@ export default class Filler {
   }
 
   get isVertical() {
-    return this.height > this.width
+    return this.outerHeight > this.outerWidth
   }
 
   pan() {

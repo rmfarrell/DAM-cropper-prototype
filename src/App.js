@@ -94,9 +94,20 @@ class App extends Component {
 
           <Rend
             image={this.state.img}
-            width={500}
-            ratio={'3:2'}
+            width={400}
+            ratio={'4:5'}
             zoom={false}
+            cropGuide={this.cropGuide}
+            orientation={this.orientation}
+          >
+            <h4>4:5</h4>
+          </Rend>
+
+          <Rend
+            image={this.state.img}
+            width={400}
+            ratio={'3:2'}
+            zoom={true}
             cropGuide={this.cropGuide}
             orientation={this.orientation}
           >
@@ -105,7 +116,7 @@ class App extends Component {
 
           <Rend
             image={this.state.img}
-            width={500}
+            width={400}
             ratio={'1:1'}
             zoom={false}
             cropGuide={this.cropGuide}
@@ -116,7 +127,7 @@ class App extends Component {
 
           <Rend
             image={this.state.img}
-            width={500}
+            width={400}
             ratio={'3:2'}
             zoom={false}
             cropGuide={this.cropGuide}
@@ -127,24 +138,13 @@ class App extends Component {
 
           <Rend
             image={this.state.img}
-            width={500}
+            width={400}
             ratio={'2:1'}
             zoom={false}
             cropGuide={this.cropGuide}
             orientation={this.orientation}
           >
             <h4>2:1</h4>
-          </Rend>
-
-          <Rend
-            image={this.state.img}
-            width={500}
-            ratio={'4:5'}
-            zoom={false}
-            cropGuide={this.cropGuide}
-            orientation={this.orientation}
-          >
-            <h4>4:5</h4>
           </Rend>
         </div>
 

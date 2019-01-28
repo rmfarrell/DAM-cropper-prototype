@@ -43,7 +43,7 @@ class Rend extends Component {
       ratio = '',
       orientation = ''
     } = this.props,
-      _zoom = (zoom) ? 'in' : 'out',
+      _zoom = (zoom) ? 'out' : 'in',
       // [ratioW = 1, ratioH = 1] = ratio.split(':'),
 
       // trimmed = {
@@ -100,7 +100,7 @@ class Rend extends Component {
 
     const cropped = filler.fill(image, cropGuide, _zoom)
 
-    this.state.ctx.fillStyle = "#000"
+    this.state.ctx.fillStyle = "red"
     this.state.ctx.fillRect(0, 0, this.canvas.current.width, this.canvas.current.height);
 
     this.state.ctx.drawImage(
