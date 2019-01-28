@@ -190,7 +190,7 @@ class App extends Component {
           {this.state.renders.map(({ width, ratio, zoom }, idx) => {
 
             return (<Rend
-              key={`${ratio}${zoom}${width}`}
+              key={idx}
               image={this.state.img}
               width={width}
               ratio={ratio}
