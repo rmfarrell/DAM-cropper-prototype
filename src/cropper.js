@@ -32,14 +32,83 @@ export default class Cropper {
     }
   }
 
+  /**
+   * Crop the image in height/width area
+   * @param {number} width - output image weight
+   * @param {number} height - output image height
+   * @param {string} zoom - (in|out) sets whether the image should zoom in or out to fill the space
+   */
+  crop(width = 0, height = 0, zoom = 'in') {
+
+    // set width/height
+    this.outerWidth = width;
+    this.outerHeight = height
 
 
-  anchorToOuterEdge() {
+    if (zoom === 'out') {
+      this._anchorToInnerEdge(this.image, this.cropGuide)
+      this._zoomToFit()
+      this._cover()
+    } else {
+      this._anchorToOuterEdge(this.image, this.focus)
+      this._zoomToFit()
+      this._cover()
+    }
+
+    return [this.x, this.y, this.width, this.height]
+  }
+
+
+  // -- Internals
+
+  /**
+   * Is the image vertical?
+   * @return {Boolean}
+   */
+  get _isVertical() {
+    return this.outerHeight > this.outerWidth
+  }
+
+  /**
+   * Find any gaps between the image and the outer edge
+   * @return {Boolean[]} - corresponds with top, bottom, left, and right edges respectively
+   */
+  get _gaps() {
+    const { height, outerHeight, outerWidth, width, x, y } = this
+
+    return [
+
+      // top
+      y > 0,
+
+      // bottom
+      y + height < outerHeight,
+
+      // left
+      x > 0,
+
+      // right
+      x + width < outerWidth
+    ]
+  }
+
+  /**
+   * Check if gaps returns anything
+   * @returns {Boolean}
+   */
+  get _isGap() {
+    return this._gaps.some((b) => b)
+  }
+
+  /**
+   * Place the image in the frame matching its longest axis
+   */
+  _anchorToOuterEdge() {
 
     const { height, width } = this.image;
 
     // fill the largest axis
-    if (this.isVertical) {
+    if (this._isVertical) {
       this.scale = this.outerHeight / height;
       this.height = this.outerHeight;
       this.width = width * this.scale;
@@ -50,13 +119,15 @@ export default class Cropper {
       this.scale = this.outerWidth / width;
       this.width = this.outerWidth;
       this.height = height * this.scale;
-      // 200 - 400 * 0.5
       this.y = (this.outerHeight / 2) - (this.height * this.focus.y)
       this.x = 0
     }
   }
 
-  anchorToInnerEdge() {
+  /**
+   * Place the image in the frame matching the longest crop guide to the longest edge
+   */
+  _anchorToInnerEdge() {
 
     const { height, width } = this.image,
       { left, top, right, bottom } = this.cropGuide
@@ -80,12 +151,21 @@ export default class Cropper {
     this.y = (this.outerHeight / 2) - (this.height * this.focus.y)
   }
 
-  shift(x = 0, y = 0) {
+  /**
+   * Shift the image within the frame
+   * @param {number} x - pixels to shift left/right
+   * @param {number} y - pixels to shift up/down
+   */
+  _shift(x = 0, y = 0) {
     this.x = this.x + x
     this.y = this.y + y
   }
 
-  zoom(step = 1.05) {
+  /**
+   * Zoom in/out (scale image) without shifting image in outer frame
+   * @param {number} step - amount to enlarge image
+   */
+  _zoom(step = 1.05) {
     const oldHeight = this.height,
       oldWidth = this.width
     this.height = oldHeight * step
@@ -94,73 +174,35 @@ export default class Cropper {
     this.y = this.y -= (this.height - oldHeight) / 2
   }
 
-  zoomToFit() {
-
+  /**
+   * Ensure image fits in frame; if not 
+   */
+  _zoomToFit() {
     while (this.height < this.outerHeight || this.width < this.outerWidth) {
-      this.zoom()
+      this._zoom()
     }
   }
 
-  cover() {
+  /**
+   * shift image around until the outer edges are covered
+   */
+  _cover() {
+    const [top, bottom, left, right] = this._gaps
 
-    if (this.gaps[0]) {
+    if (top) {
       this.y = 0
     }
-    if (this.gaps[1]) {
-      this.shift(0, 1)
-      this.cover()
+    if (bottom) {
+      this._shift(0, 1)
+      this._cover()
     }
-    if (this.gaps[2]) {
+    if (left) {
       this.x = 0
     }
-    if (this.gaps[3]) {
-      this.shift(1)
-      this.cover()
+    if (right) {
+      this._shift(1)
+      this._cover()
     }
     return
-  }
-  crop(width = 0, height = 0, zoom = 'in') {
-    this.outerHeight = height
-    this.outerWidth = width;
-
-
-    if (zoom === 'out') {
-      this.anchorToInnerEdge(this.image, this.cropGuide)
-      this.zoomToFit()
-      this.cover()
-    } else {
-      this.anchorToOuterEdge(this.image, this.focus)
-      this.zoomToFit()
-      this.cover()
-    }
-
-    return [this.x, this.y, this.width, this.height]
-  }
-
-  get isVertical() {
-    return this.outerHeight > this.outerWidth
-  }
-
-  get gaps() {
-    const { height, outerHeight, outerWidth, width, x, y } = this
-
-    return [
-
-      // top
-      y > 0,
-
-      // bottom
-      y + height < outerHeight,
-
-      // left
-      x > 0,
-
-      // right
-      x + width < outerWidth
-    ]
-  }
-
-  get isGap() {
-    return this.gaps.some((b) => b)
   }
 }
