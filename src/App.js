@@ -95,6 +95,17 @@ class App extends Component {
           <Rend
             image={this.state.img}
             width={500}
+            ratio={'3:2'}
+            zoom={false}
+            cropGuide={this.cropGuide}
+            orientation={this.orientation}
+          >
+            <h4>3:2 (zoomed)</h4>
+          </Rend>
+
+          <Rend
+            image={this.state.img}
+            width={500}
             ratio={'1:1'}
             zoom={false}
             cropGuide={this.cropGuide}
@@ -105,7 +116,7 @@ class App extends Component {
 
           <Rend
             image={this.state.img}
-            width={600}
+            width={500}
             ratio={'3:2'}
             zoom={false}
             cropGuide={this.cropGuide}

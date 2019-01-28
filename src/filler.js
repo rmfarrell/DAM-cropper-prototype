@@ -52,8 +52,31 @@ export default class Filler {
     // console.log('y', this.y)
   }
 
-  anchorToInnerEdge() {
+  anchorToInnerEdge(image, cropGuide) {
 
+    if (!image) {
+      throw new Error('no image')
+    }
+
+    const { height, width } = image,
+      { left, top, right, bottom, center } = cropGuide
+
+    // fill the largest axis
+    if (this.isVertical) {
+      this.scale = this.outerHeight / height;
+      this.height = this.outerHeight;
+      this.width = width * this.scale;
+      this.x = (this.outerWidth / 2) - (this.width * center.x)
+      this.y = 0
+      return
+    } else {
+      this.scale = this.outerWidth / width;
+      this.width = this.outerWidth;
+      this.height = height * this.scale;
+      // 200 - 400 * 0.5
+      this.y = (this.outerHeight / 2) - (this.height * center.y)
+      this.x = 0
+    }
   }
 
   get focalPoint() {
@@ -68,21 +91,19 @@ export default class Filler {
     this.y = this.y + y
   }
 
-  get shouldZoom() {
-    return this.height < this.outerHeight || this.width < this.outerWidth
+  zoom(step = 1.05) {
+    const oldHeight = this.height,
+      oldWidth = this.width
+    this.height = oldHeight * step
+    this.width = oldWidth * step
+    this.x = this.x -= (this.width - oldWidth) / 2
+    this.y = this.y -= (this.height - oldHeight) / 2
   }
 
-  zoom() {
-    const zoomStep = 1.05;
-    console.log(this.height)
-    while (this.shouldZoom) {
-      const oldHeight = this.height,
-        oldWidth = this.width
-      this.height = oldHeight * zoomStep
-      this.width = oldWidth * zoomStep
-      console.log(this.height)
-      this.x = this.x -= (this.width - oldWidth) / 2
-      this.y = this.y -= (this.height - oldHeight) / 2
+  zoomToFit() {
+
+    while (this.height < this.outerHeight || this.width < this.outerWidth) {
+      this.zoom()
     }
   }
 
@@ -111,13 +132,14 @@ export default class Filler {
       return;
     }
 
+
     if (zoom === 'out') {
       this.anchorToInnerEdge(image, cropGuide)
     } else {
       this.anchorToOuterEdge(image, cropGuide)
     }
 
-    this.zoom()
+    this.zoomToFit()
 
     this.cover()
 
