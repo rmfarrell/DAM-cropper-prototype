@@ -47,13 +47,11 @@ export default class Cropper {
 
     if (zoom === 'out') {
       this._anchorToInnerEdge(this.image, this.cropGuide)
-      this._zoomToFit()
-      this._cover()
     } else {
       this._anchorToOuterEdge(this.image, this.focus)
-      this._zoomToFit()
-      this._cover()
     }
+    this._zoomToFit()
+    this._cover()
 
     return [this.x, this.y, this.width, this.height]
   }
