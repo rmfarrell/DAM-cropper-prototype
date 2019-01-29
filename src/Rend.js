@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import styles from './css/Rend.module.css';
-import { timingSafeEqual } from 'crypto';
 import Cropper from './cropper'
 
 class Rend extends Component {
