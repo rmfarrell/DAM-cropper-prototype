@@ -35,18 +35,15 @@ class Rend extends Component {
       return;
     }
     const {
-      height = 0,
       width = 0,
       image,
       cropGuide,
       zoom = false,
-      ratio = '',
-      orientation = ''
+      ratio = ''
     } = this.props,
       _zoom = (zoom) ? 'out' : 'in';
 
-    let h, w, scale, cropHeight, cropWidth, x, y,
-      _ratio = ratio.split(':');
+    let _ratio = ratio.split(':');
     _ratio = _ratio[0] / _ratio[1];
 
     this.canvas.current.width = width
@@ -90,19 +87,3 @@ Rend.propTypes = {
 }
 
 export default Rend
-
-
-function ratioFromWidth(w = 0, ratio = '') {
-  return {
-    height: 0,
-    width: 0
-  }
-}
-
-function ratioFromHeight(h = 0, ratio = '') {
-
-  return {
-    height: 0,
-    width: 0
-  }
-}
