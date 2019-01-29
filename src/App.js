@@ -10,12 +10,6 @@ class App extends Component {
   constructor() {
     super()
     this.state = {
-      zoom: 0,
-      trim: 0,
-      ratio: {
-        height: 1,
-        width: 1
-      },
       img: null,
       previewImg: null,
       cropBox: [0, 0, 0, 0],
