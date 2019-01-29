@@ -65,11 +65,10 @@ class Rend extends Component {
   }
 
   render() {
-    const canvas = <canvas height="0" width="0" ref={this.canvas}></canvas>
 
     return (
       <div className={styles.root}>
-        {canvas}
+        <canvas height="0" width="0" ref={this.canvas}></canvas>
         {this.shouldSet && this.props.children}
       </div >
     );
