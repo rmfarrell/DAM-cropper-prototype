@@ -193,7 +193,7 @@ class App extends Component {
               cropGuide={this.cropGuide}
               orientation={this.orientation}
             >
-              <h4>{`/v2/${ratio}/${zoom ? 'zoom/' : ''}imagename.jpg?w=${width}`}</h4>
+              <h4>{`/v2/ratio/${ratio}/width/${width}/${zoom ? 'zoom/' : ''}imagename.jpg`}</h4>
               <form onSubmit={(e) => this.updateRendition(e, idx)}>
                 <p>
                   <input type="checkbox" name="zoom" defaultChecked={zoom} />
