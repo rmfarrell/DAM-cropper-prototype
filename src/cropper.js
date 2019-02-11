@@ -60,12 +60,21 @@ export default class Cropper {
   // -- Internals
 
   /**
-   * Is the image vertical?
-   * @return {Boolean}
+   * Get image's orientation
+   * @returns {String} -  vertical|horiztonal|square
    */
-  get _isVertical() {
-    return this.outerHeight > this.outerWidth
+  get _orientation() {
+
+    if (this.outerHeight === this.outerWidth) {
+      return 'square'
+    }
+    if (this.outerHeight > this.outerWidth) {
+      return 'vertical'
+    }
+    return 'horizontal'
   }
+
+
 
   /**
    * Find any gaps between the image and the outer edge
@@ -105,20 +114,34 @@ export default class Cropper {
 
     const { height, width } = this.image;
 
-    // fill the largest axis
-    if (this._isVertical) {
-      this.scale = this.outerHeight / height;
-      this.height = this.outerHeight;
-      this.width = width * this.scale;
-      this.x = (this.outerWidth / 2) - (this.width * this.focus.x)
-      this.y = 0
-      return
-    } else {
-      this.scale = this.outerWidth / width;
-      this.width = this.outerWidth;
-      this.height = height * this.scale;
-      this.y = (this.outerHeight / 2) - (this.height * this.focus.y)
-      this.x = 0
+    switch (this._orientation) {
+
+      case 'vertical':
+        this.scale = this.outerHeight / height;
+        this.height = this.outerHeight;
+        this.width = width * this.scale;
+        this.x = (this.outerWidth / 2) - (this.width * this.focus.x)
+        this.y = 0
+        break;
+
+      case 'horizontal':
+        this.scale = this.outerWidth / width;
+        this.width = this.outerWidth;
+        this.height = height * this.scale;
+        this.y = (this.outerHeight / 2) - (this.height * this.focus.y)
+        this.x = 0
+        break;
+
+      case 'square':
+        this.scale = this.outerWidth / width;
+        this.width = this.outerWidth;
+        this.height = height * this.scale;
+        this.y = (this.outerHeight / 2) - (this.height * this.focus.y)
+        this.x = 0;
+        break;
+
+      default:
+        throw new Error(`Unrecoginzed orientation: ${this._orientation}`)
     }
   }
 
