@@ -123,12 +123,11 @@ export default class Cropper {
         break;
 
       case 'square':
-        console.log(this.image.width, this.image.height, this.outerWidth / this.outerHeight)
         if (this.image.width / this.image.height < this.outerWidth / this.outerHeight) {
           this._alignOuterEdgesHorizontally()
-        } else {
-          this._alignOuterEdgesVertically()
+          break;
         }
+        this._alignOuterEdgesVertically()
         break;
 
       default:

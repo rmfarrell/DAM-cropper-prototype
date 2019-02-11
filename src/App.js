@@ -12,7 +12,7 @@ class App extends Component {
     this.state = {
       img: null,
       previewImg: null,
-      cropBox: [ 0, 0, 0, 0 ],
+      cropBox: [0, 0, 0, 0],
       cropCoords: [],
       ctx: null,
       renders: [
@@ -87,7 +87,6 @@ class App extends Component {
   get scale() {
     const { previewImg } = this.state
     if (!previewImg) return null;
-    console.log(maxHeight / previewImg.height)
     return maxHeight / previewImg.height
   }
 
@@ -106,10 +105,10 @@ class App extends Component {
       return null;
     }
     mins = {
-      left: cropCoords[ 0 ] / w,
-      top: cropCoords[ 1 ] / h,
-      right: cropCoords[ 2 ] / w,
-      bottom: cropCoords[ 3 ] / h,
+      left: cropCoords[0] / w,
+      top: cropCoords[1] / h,
+      right: cropCoords[2] / w,
+      bottom: cropCoords[3] / h,
     }
     focus = {
       x: (mins.right + mins.left) / 2,
@@ -123,7 +122,7 @@ class App extends Component {
   }
 
   preview = ({ target: { files = [] } }) => {
-    const [ file ] = files,
+    const [file] = files,
       reader = new FileReader(),
       canvas = this.originalInput.current,
       ctx = canvas.getContext('2d')
@@ -148,7 +147,7 @@ class App extends Component {
     evt.preventDefault()
     const { width, ratio1, ratio2, zoom } = serialize(evt.target, { hash: true }),
       renders = this.state.renders.slice(0)
-    renders[ idx ] = {
+    renders[idx] = {
       width: Number(width),
       ratio: `${ratio1}:${ratio2}`,
       zoom: zoom === 'on'
@@ -200,8 +199,8 @@ class App extends Component {
                 </p>
                 <p>
                   <label>Ratio</label>
-                  <input type="number" name="ratio1" width="2" defaultValue={ratio.split(':')[ 0 ]} />:
-                <input type="number" name="ratio2" width="2" defaultValue={ratio.split(':')[ 1 ]} />
+                  <input type="number" name="ratio1" width="2" defaultValue={ratio.split(':')[0]} />:
+                <input type="number" name="ratio2" width="2" defaultValue={ratio.split(':')[1]} />
                 </p>
                 <p>
                   <label>Width</label>
@@ -247,8 +246,8 @@ class App extends Component {
 
   componentDidMount() {
     const canvas = this.originalInput.current
-    let start = [ 0, 0 ],
-      end = [ 0, 0 ];
+    let start = [0, 0],
+      end = [0, 0];
 
     canvas.addEventListener('mousedown', ({ offsetX = 0, offsetY = 0 }) => {
       start = [
@@ -264,31 +263,31 @@ class App extends Component {
       ]
 
       // don't accept upside down rectangles
-      if (start[ 0 ] > end[ 0 ] || start[ 1 ] > end[ 1 ]) {
+      if (start[0] > end[0] || start[1] > end[1]) {
         console.error('no upside down crop rectangles RN')
         return;
       }
 
       this.setState({
         cropBox: [
-          Math.min(start[ 0 ], end[ 0 ]),
-          Math.min(start[ 1 ], end[ 1 ]),
-          Math.abs(start[ 0 ] - end[ 0 ]),
-          Math.abs(start[ 1 ] - end[ 1 ])
+          Math.min(start[0], end[0]),
+          Math.min(start[1], end[1]),
+          Math.abs(start[0] - end[0]),
+          Math.abs(start[1] - end[1])
         ],
-        cropCoords: [ ...start, ...end ]
+        cropCoords: [...start, ...end]
       })
     })
   }
 
   drawRect = () => {
     const { ctx, cropBox, previewImg } = this.state,
-      centerCoords = [ cropBox[ 0 ] + cropBox[ 2 ] / 2, cropBox[ 1 ] + cropBox[ 3 ] / 2 ]
+      centerCoords = [cropBox[0] + cropBox[2] / 2, cropBox[1] + cropBox[3] / 2]
     this.resetImage()
     ctx.globalCompositeOperation = 'source-over'
 
     // dotted line
-    ctx.setLineDash([ 5, 5 ]);
+    ctx.setLineDash([5, 5]);
     ctx.strokeRect(...cropBox)
 
     // center circle
