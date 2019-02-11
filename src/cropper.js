@@ -6,6 +6,8 @@ export default class Cropper {
    * Constructor for Cropper
    * 
    * @param {Image} image
+   * @param {number} image.height
+   * @param {number} image.width
    * @param {object} focus - x/y coordinates of center of photo center of interest
    * @param {number} focus.x
    * @param {number} focus.y 
