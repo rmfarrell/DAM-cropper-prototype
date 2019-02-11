@@ -112,37 +112,48 @@ export default class Cropper {
    */
   _anchorToOuterEdge() {
 
-    const { height, width } = this.image;
-
     switch (this._orientation) {
 
       case 'vertical':
-        this.scale = this.outerHeight / height;
-        this.height = this.outerHeight;
-        this.width = width * this.scale;
-        this.x = (this.outerWidth / 2) - (this.width * this.focus.x)
-        this.y = 0
+        this._alignOuterEdgesVertically()
         break;
 
       case 'horizontal':
-        this.scale = this.outerWidth / width;
-        this.width = this.outerWidth;
-        this.height = height * this.scale;
-        this.y = (this.outerHeight / 2) - (this.height * this.focus.y)
-        this.x = 0
+        this._alignOuterEdgesHorizontally()
         break;
 
       case 'square':
-        this.scale = this.outerWidth / width;
-        this.width = this.outerWidth;
-        this.height = height * this.scale;
-        this.y = (this.outerHeight / 2) - (this.height * this.focus.y)
-        this.x = 0;
+        console.log(this.image.width, this.image.height, this.outerWidth / this.outerHeight)
+        if (this.image.width / this.image.height < this.outerWidth / this.outerHeight) {
+          this._alignOuterEdgesHorizontally()
+        } else {
+          this._alignOuterEdgesVertically()
+        }
         break;
 
       default:
         throw new Error(`Unrecoginzed orientation: ${this._orientation}`)
     }
+  }
+
+  _alignOuterEdgesVertically() {
+    const { height = 0, width = 0 } = this.image;
+
+    this.scale = this.outerHeight / height;
+    this.height = this.outerHeight;
+    this.width = width * this.scale;
+    this.x = (this.outerWidth / 2) - (this.width * this.focus.x)
+    this.y = 0
+  }
+
+  _alignOuterEdgesHorizontally() {
+    const { height = 0, width = 0 } = this.image;
+
+    this.scale = this.outerWidth / width;
+    this.width = this.outerWidth;
+    this.height = height * this.scale;
+    this.y = (this.outerHeight / 2) - (this.height * this.focus.y)
+    this.x = 0
   }
 
   /**
