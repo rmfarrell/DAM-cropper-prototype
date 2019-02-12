@@ -86,31 +86,56 @@ export default class Cropper {
   }
 
   /**
+   * Convenience wrapper for crop with zoom set to false
+   * @param {number} width
+   * @param {number} height
+   * @return {number[]} 
+   */
+  trim(width = 0, height = 0) {
+    return this.crop(width, height)
+  }
+
+
+  /**
+   * Convenience wrapper for crop with zoom set to true
+   * @param {number} width
+   * @param {number} height
+   * @return {number[]}
+   */
+  zoom(width = 0, height = 0) {
+    return this.crop(width, height, true)
+  }
+
+  /**
    * Crop the image in height/width area
    * @param {number} width - output image weight
    * @param {number} height - output image height
-   * @param {string} zoom - (in|out) sets whether the image should zoom in or out to fill the space
+   * @param {Boolean} zoom - set whether image is zoomed in
+   * @return {number[]}
    */
-  crop(width = 0, height = 0, zoom = 'in') {
+  crop(width = 0, height = 0, zoom = false) {
 
     // set width/height
     this.outerWidth = width;
     this.outerHeight = height
 
-    if (zoom === 'out') {
+    if (zoom) {
       this._anchorToInnerEdge(this.image, this.cropGuide)
     } else {
       this._anchorToOuterEdge(this.image, this.focus)
     }
 
     this._zoomToFit()
+    console.log('////')
+    console.log(this.height, this.outerHeight)
+    console.log(this.width, this.outerWidth)
     this._cover()
 
     return [this.x, this.y, this.width, this.height]
   }
 
-
   // -- Internals
+
 
   /**
    * Validate an object of relative coordinates (numbers between 0 and 1)
@@ -242,17 +267,24 @@ export default class Cropper {
   }
 
   /**
-   * Ensure image fits in frame
+   * Zoom in/out (scale image) without shifting image in outer frame
+   * @param {number} step - amount to enlarge image
+   */
+  _zoom(step = 1.05) {
+    const oldHeight = this.height,
+      oldWidth = this.width
+    this.height = oldHeight * step
+    this.width = oldWidth * step
+    this.x = this.x -= (this.width - oldWidth) / 2
+    this.y = this.y -= (this.height - oldHeight) / 2
+  }
+
+  /**
+   * Ensure image fits in frame; if not 
    */
   _zoomToFit() {
-    let mult
-    if (this.width < this.outerWidth) {
-      mult = (this.outerWidth - this.width) / this.width
-      this.height = this.height * mult
-    }
-    if (this.height < this.outerHeight) {
-      mult = (this.outerWidth - this.width) / this.width
-      this.width = this.width * mult
+    while (this.height < this.outerHeight || this.width < this.outerWidth) {
+      this._zoom()
     }
   }
 

@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import styles from './css/Rend.module.css';
-import Cropper from './cropper'
+import Cropper from './cropper';
 
 class Rend extends Component {
   constructor(props) {
@@ -39,8 +39,7 @@ class Rend extends Component {
       cropGuide,
       zoom = false,
       ratio = ''
-    } = this.props,
-      _zoom = (zoom) ? 'out' : 'in';
+    } = this.props
 
     let _ratio = ratio.split(':');
     _ratio = _ratio[0] / _ratio[1];
@@ -62,7 +61,7 @@ class Rend extends Component {
 
     this.state.ctx.drawImage(
       image,
-      ...cropping.crop(this.canvas.current.width, this.canvas.current.height, _zoom)
+      ...cropping.crop(this.canvas.current.width, this.canvas.current.height, zoom)
     )
   }
 
