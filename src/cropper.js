@@ -17,7 +17,7 @@ export default class Cropper {
    * @param {number} [cropGuide][left] - left edge of crop area
    * @param {number} [cropGuide][right] - right edge of crop area
    */
-  constructor(image, focus = { x: 0, y: 0 }, cropGuide) {
+  constructor(image, focus = { x: 0.5, y: 0.5 }, cropGuide) {
     this.focus = focus
     this.image = image
     this.cropGuide = cropGuide
@@ -46,12 +46,12 @@ export default class Cropper {
     this.outerWidth = width;
     this.outerHeight = height
 
-
     if (zoom === 'out') {
       this._anchorToInnerEdge(this.image, this.cropGuide)
     } else {
       this._anchorToOuterEdge(this.image, this.focus)
     }
+
     this._zoomToFit()
     this._cover()
 
@@ -113,28 +113,10 @@ export default class Cropper {
    * Place the image in the frame matching its longest axis
    */
   _anchorToOuterEdge() {
-
-    switch (this._orientation) {
-
-      case 'vertical':
-        this._alignOuterEdgesVertically()
-        break;
-
-      case 'horizontal':
-        this._alignOuterEdgesHorizontally()
-        break;
-
-      case 'square':
-        if (this.image.width / this.image.height < this.outerWidth / this.outerHeight) {
-          this._alignOuterEdgesHorizontally()
-          break;
-        }
-        this._alignOuterEdgesVertically()
-        break;
-
-      default:
-        throw new Error(`Unrecoginzed orientation: ${this._orientation}`)
+    if (this.image.width / this.image.height < this.outerWidth / this.outerHeight) {
+      return this._alignOuterEdgesHorizontally()
     }
+    return this._alignOuterEdgesVertically()
   }
 
   _alignOuterEdgesVertically() {
