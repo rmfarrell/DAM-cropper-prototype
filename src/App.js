@@ -95,7 +95,7 @@ class App extends Component {
     if (!this.state.previewImg) {
       return null;
     }
-    let mins, focus
+    let mins
     const { cropCoords } = this.state,
       { height, width } = this.state.previewImg,
       h = height * this.scale,
@@ -110,11 +110,7 @@ class App extends Component {
       right: cropCoords[2] / w,
       bottom: cropCoords[3] / h,
     }
-    focus = {
-      x: (mins.right + mins.left) / 2,
-      y: (mins.top + mins.bottom) / 2
-    }
-    return Object.assign(mins, { focus })
+    return mins
   }
 
   reset() {

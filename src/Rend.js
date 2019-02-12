@@ -48,10 +48,14 @@ class Rend extends Component {
     this.canvas.current.width = width
     this.canvas.current.height = width / _ratio;
 
-    const cropping = new Cropper({
-      height: image.height,
-      width: image.width
-    }, cropGuide.focus, cropGuide);
+    const cropping = new Cropper(image.width, image.height);
+
+    // set the cropGuide
+    try {
+      cropping.cropGuide = cropGuide
+    } catch (e) {
+      console.error(e)
+    }
 
     this.ctx.fillStyle = "red"
     this.ctx.fillRect(0, 0, this.canvas.current.width, this.canvas.current.height);

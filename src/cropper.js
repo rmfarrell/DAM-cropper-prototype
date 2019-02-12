@@ -4,23 +4,19 @@
 export default class Cropper {
   /** 
    * Constructor for Cropper
-   * 
-   * @param {Image} image
-   * @param {number} image.height
-   * @param {number} image.width
-   * @param {object} focus - x/y coordinates of center of photo center of interest
-   * @param {number} focus.x
-   * @param {number} focus.y 
-   * @param {object} [cropGuide]
-   * @param {number} [cropGuide][top] - top of crop area
-   * @param {number} [cropGuide][bottom] - bottom of crop area
-   * @param {number} [cropGuide][left] - left edge of crop area
-   * @param {number} [cropGuide][right] - right edge of crop area
+   * @param {number} width - original image width
+   * @param {number} height - original image height
    */
-  constructor(image, focus = { x: 0.5, y: 0.5 }, cropGuide) {
-    this.focus = focus
-    this.image = image
-    this.cropGuide = cropGuide
+  constructor(width, height) {
+    this.image = {
+      height,
+      width
+    }
+    this._cropGuide = null
+    this._focus = {
+      x: 0.5,
+      y: 0.5
+    }
     this.outerWidth = 0
     this.outerHeight = 0
     this.width = 0
@@ -29,9 +25,66 @@ export default class Cropper {
     this.x = 0
     this.y = 0
 
-    if (!image) {
-      throw new Error('image required')
+    if (!height || !width) {
+      throw new Error('height and width required')
     }
+  }
+
+  /**
+   * Set the cropGuide
+   * @param {object} cropGuide
+   * @param {number} cropGuide.top - top of crop area
+   * @param {number} cropGuide.bottom - bottom of crop area
+   * @param {number} cropGuide.left - left edge of crop area
+   * @param {number} cropGuide.right - right edge of crop area
+   */
+  set cropGuide(_cropGuide = {}) {
+    console.log(_cropGuide)
+    const {
+      top = 0.2,
+      right = 0.8,
+      bottom = 0.8,
+      left = 0.2
+    } = _cropGuide,
+      errs = this._validateRelativeCoordinates(_cropGuide)
+
+    if (right <= left || bottom <= top) {
+      errs.push(new Error(`Invalid cropGuide values:
+        Left must be less than right and top must be less than bottom`))
+    }
+
+    errs.forEach((err) => {
+      throw err
+    })
+
+    this._cropGuide = _cropGuide
+    this.focus = {
+      x: (right + left) / 2,
+      y: (top + bottom) / 2
+    }
+  }
+
+  /**
+   * Set the focus point
+   * @param {object} focus
+   * @param {number} focus.x - float between 0-1 representing focus's X coorinate
+   * @param {number} focus.y - float between 0-1 representing focus's Y coorinate
+   */
+  set focus(_focus = { x: 0.5, y: 0.5 }) {
+    console.log(_focus)
+    const errs = this._validateRelativeCoordinates(_focus)
+    errs.forEach((err) => {
+      throw err
+    })
+    this._focus = _focus
+  }
+
+  get cropGuide() {
+    return this._cropGuide;
+  }
+
+  get focus() {
+    return this._focus;
   }
 
   /**
@@ -60,6 +113,22 @@ export default class Cropper {
 
 
   // -- Internals
+
+  /**
+   * Validate an object of relative coordinates (numbers between 0 and 1)
+   * @param {Object} obj
+   * @return {Error}
+   */
+  _validateRelativeCoordinates(obj = {}) {
+    const errs = []
+    for (let key in obj) {
+      if (typeof obj[key] !== 'number' || obj[key] < 0 || obj[key] > 1) {
+        errs.push(new Error(
+          `Expected ${key} to contain a number between 0 and 1 but recieved ${obj.key}`))
+      }
+    }
+    return errs
+  }
 
   /**
    * Get image's orientation
