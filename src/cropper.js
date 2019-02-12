@@ -39,7 +39,6 @@ export default class Cropper {
    * @param {number} cropGuide.right - right edge of crop area
    */
   set cropGuide(_cropGuide = {}) {
-    console.log(_cropGuide)
     const {
       top = 0.2,
       right = 0.8,
@@ -71,7 +70,6 @@ export default class Cropper {
    * @param {number} focus.y - float between 0-1 representing focus's Y coorinate
    */
   set focus(_focus = { x: 0.5, y: 0.5 }) {
-    console.log(_focus)
     const errs = this._validateRelativeCoordinates(_focus)
     errs.forEach((err) => {
       throw err
@@ -144,8 +142,6 @@ export default class Cropper {
     }
     return 'horizontal'
   }
-
-
 
   /**
    * Find any gaps between the image and the outer edge
@@ -246,24 +242,17 @@ export default class Cropper {
   }
 
   /**
-   * Zoom in/out (scale image) without shifting image in outer frame
-   * @param {number} step - amount to enlarge image
-   */
-  _zoom(step = 1.05) {
-    const oldHeight = this.height,
-      oldWidth = this.width
-    this.height = oldHeight * step
-    this.width = oldWidth * step
-    this.x = this.x -= (this.width - oldWidth) / 2
-    this.y = this.y -= (this.height - oldHeight) / 2
-  }
-
-  /**
-   * Ensure image fits in frame; if not 
+   * Ensure image fits in frame
    */
   _zoomToFit() {
-    while (this.height < this.outerHeight || this.width < this.outerWidth) {
-      this._zoom()
+    let mult
+    if (this.width < this.outerWidth) {
+      mult = (this.outerWidth - this.width) / this.width
+      this.height = this.height * mult
+    }
+    if (this.height < this.outerHeight) {
+      mult = (this.outerWidth - this.width) / this.width
+      this.width = this.width * mult
     }
   }
 
